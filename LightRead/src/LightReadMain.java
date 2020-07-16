@@ -13,8 +13,14 @@ public class LightReadMain {
 		Scanner scan = new Scanner(file);
 		
 		while(scan.hasNextLine()) {
-			System.out.println(scan.nextLine());
-			Thread.sleep(500);
+			Scanner each_word = new Scanner(scan.nextLine());
+			while(each_word.hasNext()) {
+				String word_on_screen = each_word.next();
+				System.out.println(word_on_screen);
+				Thread.sleep(500);
+			}
+//			System.out.println(scan.nextLine());
+//			Thread.sleep(500);
 		}
 	}
 	
