@@ -6,8 +6,14 @@ public class LightReadMain {
 	
 	// Save for custom file destination
 	// String file_path;
+	static int word_speed;
 	
 	public static void main(String args[]) throws FileNotFoundException, InterruptedException {
+		
+		LightReadMain overlord = new LightReadMain();
+		Scanner decide_speed = new Scanner(System.in);
+		System.out.println("How quickly would you like to read?\n{200,300,500,800}");
+		overlord.set_speed(decide_speed.nextInt());
 		
 		File file = new File("C:\\Users\\Griff_Home_PC\\Desktop\\Java_Projects\\LightRead\\Sage.txt");
 		Scanner scan = new Scanner(file);
@@ -17,11 +23,17 @@ public class LightReadMain {
 			while(each_word.hasNext()) {
 				String word_on_screen = each_word.next();
 				System.out.println(word_on_screen);
-				Thread.sleep(500);
+				Thread.sleep(overlord.get_speed(word_speed)); // Work to develop user-designated speed
 			}
-//			System.out.println(scan.nextLine());
-//			Thread.sleep(500);
 		}
+	}
+	
+	public void set_speed(int word_speed) {
+		this.word_speed = word_speed;
+	}
+	
+	public int get_speed(int word_speed) {
+		return this.word_speed;
 	}
 	
 }
