@@ -1,20 +1,27 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
+import javax.swing.border.Border;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
@@ -24,7 +31,7 @@ public class LightReadMain {
 	JFrame gui_frame;
 	JPanel option_panel;
 	JFileChooser reader_script;
-	JTextPane words_on_screen;
+	JLabel words_on_screen;
 	
 	static LightReadMain overlord = new LightReadMain();
 	static Map<Integer, Integer> speed_map = new HashMap<>() {
@@ -35,14 +42,15 @@ public class LightReadMain {
 			put(800, 28);
 		}
 	};
+	List<String> text_to_read = new ArrayList<String>();
 	static int word_speed;
 	static int white = 1;
 	static String txt_path;
 	
 	public static void main(String args[]) throws FileNotFoundException, InterruptedException {
 		
-		overlord.reader_logic();
-		//overlord.reader_gui();
+		//overlord.reader_logic();
+		overlord.reader_gui();
 		
 	}
 	
@@ -80,21 +88,23 @@ public class LightReadMain {
 		
 		reader_script = new JFileChooser();
 		
-		words_on_screen = new JTextPane();
-		words_on_screen.setEditable(false);
+		words_on_screen = new JLabel();
+		Border border = BorderFactory.createLineBorder(Color.BLACK);
+		words_on_screen.setBorder(border);
+		words_on_screen.setPreferredSize(new Dimension(400,200));
 		Font font = new Font("Serif", Font.BOLD, 30);
 		words_on_screen.setFont(font);
-		StyledDocument doc = words_on_screen.getStyledDocument();
-		SimpleAttributeSet center = new SimpleAttributeSet();
-		StyleConstants.setAlignment(center,  StyleConstants.ALIGN_CENTER);
-		doc.setParagraphAttributes(0, doc.getLength(), center, false);
-		words_on_screen.setText("Welcome to LightRead.\nUpload your text and choose your speed.");
+		words_on_screen.setHorizontalAlignment(JLabel.CENTER);
+		words_on_screen.setVerticalAlignment(JLabel.CENTER);
+		words_on_screen.setText("Follow the buttons below.");
 		words_on_screen.setVisible(true);
+		
 		gui_frame.add(words_on_screen, BorderLayout.CENTER);
 		
 		option_panel = new JPanel();
 		option_panel.setLayout(new GridLayout(1,3));
-		gui_frame.add(option_panel,BorderLayout.NORTH);
+		
+		gui_frame.add(option_panel,BorderLayout.SOUTH);
 		
 		JButton file_select = new JButton("Choose File");
 		file_select.setActionCommand("Open File");
@@ -122,43 +132,52 @@ public class LightReadMain {
 		});
 		option_panel.add(wpm_select);
 		
-		JButton color_select = new JButton("Invert Light/Dark Mode");
-		file_select.setActionCommand("Apply New Mode");
-		file_select.addActionListener(new ActionListener() {
+		JButton reader_execute = new JButton("Begin Reading");
+		reader_execute.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent click) {
 				try {
-					if(white == 1) {
-						words_on_screen.setBackground(Color.black);
-						words_on_screen.setForeground(Color.white);
-						white = 0;
-					} else {
-						words_on_screen.setBackground(Color.white);
-						words_on_screen.setForeground(Color.black);
-						white = 1;
-					}
+					each_word();
 				} catch(Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
-		option_panel.add(color_select);
+		option_panel.add(reader_execute);
 		
 		gui_frame.setVisible(true);;
 	}
 	
 	private void open_file() {
-		// TODO Auto-generated method stub
+
 		int file_choice = reader_script.showOpenDialog(gui_frame);
 		if(file_choice == JFileChooser.APPROVE_OPTION) {
 			txt_path = reader_script.getSelectedFile().getPath();
-			
-			//Define each_word()
-			//(new Thread(new each_word())).start();
 		}
 	}
 	
-	protected void set_wpm() {
-		// TODO Auto-generated method stub
+	private void set_wpm() {
+		
+		String[] wpm_speeds = {"200", "300", "500", "800"};
+		JFrame frame = new JFrame("How fast would you like to read?");
+		String selection = (String) JOptionPane.showInputDialog(frame,
+				"Which speed would you like?",
+				"WPM Selection",
+				JOptionPane.QUESTION_MESSAGE,
+				null,
+				wpm_speeds,
+				wpm_speeds[0]);
+		if(selection.equals("200")) {
+			word_speed = 265;
+		} else if(selection.equals("300")) {
+			word_speed = 160;
+		} else if(selection.equals("500")) {
+			word_speed = 75;
+		} else if(selection.equals("800")) {
+			word_speed = 28;
+		}
+	}
+	
+	private void each_word() throws FileNotFoundException, InterruptedException {
 		
 	}
 	
