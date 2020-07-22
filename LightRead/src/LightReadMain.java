@@ -21,6 +21,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
+import javax.swing.Timer;
 import javax.swing.border.Border;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
@@ -34,18 +35,8 @@ public class LightReadMain {
 	JLabel words_on_screen;
 	
 	static LightReadMain overlord = new LightReadMain();
-	static Map<Integer, Integer> speed_map = new HashMap<>() {
-		{
-			put(200, 265);
-			put(300, 165);
-			put(500, 75);
-			put(800, 28);
-		}
-	};
-	List<String> text_to_read = new ArrayList<String>();
-	static int word_speed;
-	static int white = 1;
-	static String txt_path;
+	int word_speed = 265;
+	String txt_path;
 	
 	public static void main(String args[]) throws FileNotFoundException, InterruptedException {
 		
@@ -54,30 +45,6 @@ public class LightReadMain {
 		
 	}
 	
-	public void reader_logic() throws FileNotFoundException, InterruptedException {
-		
-		Scanner decide_speed = new Scanner(System.in);
-		System.out.println("How quickly would you like to read?\n{200,300,500,800}");
-		int wanted_speed = decide_speed.nextInt();
-		
-		if(speed_map.containsKey(wanted_speed)) {
-			word_speed = speed_map.get(wanted_speed);
-		}
-		
-		File file = new File("C:\\Users\\Griff_Home_PC\\Desktop\\Java_Projects\\LightRead\\Sage.txt");
-		Scanner scan = new Scanner(file);
-		
-		while(scan.hasNextLine()) {
-			Scanner each_word = new Scanner(scan.nextLine());
-			while(each_word.hasNext()) {
-				String word_on_screen = each_word.next();
-				System.out.println(word_on_screen);
-				Thread.sleep(overlord.get_speed(word_speed)); // Work to develop user-designated speed
-			}
-		}
-	}
-	
-	// CONSTRUCTION ZONE: GUI below in development. Not implemented.
 	public void reader_gui() {
 		gui_frame = new JFrame();
 		gui_frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -88,15 +55,14 @@ public class LightReadMain {
 		
 		reader_script = new JFileChooser();
 		
-		words_on_screen = new JLabel();
+		words_on_screen = new JLabel("Follow the buttons below.");
 		Border border = BorderFactory.createLineBorder(Color.BLACK);
 		words_on_screen.setBorder(border);
 		words_on_screen.setPreferredSize(new Dimension(400,200));
-		Font font = new Font("Serif", Font.BOLD, 30);
+		Font font = new Font("Serif", Font.BOLD, 60);
 		words_on_screen.setFont(font);
 		words_on_screen.setHorizontalAlignment(JLabel.CENTER);
 		words_on_screen.setVerticalAlignment(JLabel.CENTER);
-		words_on_screen.setText("Follow the buttons below.");
 		words_on_screen.setVisible(true);
 		
 		gui_frame.add(words_on_screen, BorderLayout.CENTER);
@@ -147,12 +113,18 @@ public class LightReadMain {
 		gui_frame.setVisible(true);;
 	}
 	
-	private void open_file() {
+	private void open_file() throws Exception {
 
 		int file_choice = reader_script.showOpenDialog(gui_frame);
 		if(file_choice == JFileChooser.APPROVE_OPTION) {
 			txt_path = reader_script.getSelectedFile().getPath();
 		}
+		
+		Scanner scan = new Scanner(txt_path);
+		
+		
+		// For debugging purposes
+		System.out.println(txt_path);
 	}
 	
 	private void set_wpm() {
@@ -175,20 +147,35 @@ public class LightReadMain {
 		} else if(selection.equals("800")) {
 			word_speed = 28;
 		}
-	}
-	
-	private void each_word() throws FileNotFoundException, InterruptedException {
 		
+		// For debugging purposes
+		System.out.println(word_speed);
 	}
 	
-	//CONSTRUCTION ZONE END
-	
-	public void set_speed(int word_speed) {
-		this.word_speed = word_speed;
-	}
-	
-	public int get_speed(int word_speed) {
-		return this.word_speed;
+	private void each_word() throws FileNotFoundException {
+		List<String> words = new ArrayList<>();
+		
+		File file = new File(txt_path);
+		Scanner scan = new Scanner(file);
+		
+		while(scan.hasNextLine()) {
+			Scanner each_word = new Scanner(scan.nextLine());
+			while(each_word.hasNext()) {
+				String next_word = each_word.next();
+				words.add(next_word);
+			}
+		}
+		
+		ActionListener task_performer = new ActionListener() {
+	        @Override
+	        public void actionPerformed(ActionEvent ae) {
+	        	words_on_screen.setText(words.get(0));
+	        	words.remove(0);
+	        }
+	    };
+	    Timer timer = new Timer(word_speed, task_performer);
+	    timer.setRepeats(true);
+	    timer.start();
 	}
 	
 }
