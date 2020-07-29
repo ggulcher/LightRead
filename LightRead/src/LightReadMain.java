@@ -37,6 +37,7 @@ public class LightReadMain {
 	static LightReadMain overlord = new LightReadMain();
 	int word_speed = 265;
 	String txt_path;
+	Timer timer;
 	
 	public static void main(String args[]) throws FileNotFoundException, InterruptedException {
 		
@@ -169,11 +170,15 @@ public class LightReadMain {
 		ActionListener task_performer = new ActionListener() {
 	        @Override
 	        public void actionPerformed(ActionEvent ae) {
+	        	if(words.isEmpty()) {
+	        		timer.stop();
+	        		return;
+	        	}
 	        	words_on_screen.setText(words.get(0));
 	        	words.remove(0);
 	        }
 	    };
-	    Timer timer = new Timer(word_speed, task_performer);
+	    timer = new Timer(word_speed, task_performer);
 	    timer.setRepeats(true);
 	    timer.start();
 	}
